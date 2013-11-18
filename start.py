@@ -9,6 +9,9 @@ from mygetch import *
 totalWords = 0
 totalLetters = 0
 sessionLetters = 0
+sessionWords = 0
+sessionMissed = 0
+totalMissed = 0
 
 def clear():
     os.system('clear')
@@ -32,6 +35,8 @@ def typeCorrect(word):
     global totalWords 
     global totalLetters
     global sessionLetters
+    global sessionMissed
+    global totalMissed
     for letterPos in range(len(word)):
         userInput = getInput()
         sys.stdout.write(userInput)
@@ -39,25 +44,36 @@ def typeCorrect(word):
             totalLetters += 1
             sessionLetters += 1
         else:
+            sessionMissed += 1
+            totalMissed += 1
             print "\n"+word
             return False
     totalWords +=1
     print "\n"        
     return True
 
+def getAccuracy(place, missed):
+    total = place + missed
+    return (total - float(missed))/max(total,1) * 100
+
 def typeComplete(wordList):
+    global sessionMissed
+    global sessionWords 
     clear()
     listLen = len(wordList)
+    sessionWords = listLen
     if listLen > 0:
         for i in range(listLen):
-            print "%s\t\t\t\t%d/%d" % (wordList[i], i, listLen)
+            acc = getAccuracy(i, sessionMissed)
+            print "%s\t\t\t%d/%d %.2f%%" % (wordList[i], i, listLen, acc)
             while not typeCorrect(wordList[i]):
                 pass
     else:
         i = 0
         while True:
+            acc = getAccuracy(i, sessionMissed)
             word = getWord()
-            print "%s\t\t\t\t%d words"% (word, i)
+            print "%s\t\t\t%d words %.2f%%"% (word, i, acc)
             while not typeCorrect(word):
                 pass
             i += 1
@@ -92,7 +108,10 @@ def playAgain():
 def play():
     global totalWords 
     global totalLetters
+    global totalMissed
+    global sessionWords
     global sessionLetters
+    global sessionMissed
     playing = True
     veryStart = time.time()
     while playing:
@@ -100,17 +119,25 @@ def play():
         start = time.time()
         typeComplete(lenChoice())
         now = time.time()
+        clear()
         print "-" *20
-        print "Done"
+        print "Done!"
         print "-" *20
         print "Session"
-        print "Time   :  %.2f seconds" % (now - start)
-        print "Letters:  %d" % sessionLetters
-        print "\nTotal"
-        print "Time   :  %.2f seconds" % (now - veryStart)
-        print "Words  :  %d" % totalWords
-        print "Letters:  %d" % totalLetters
+        print "Time    :  %.2f seconds" % (now - start)
+        print "Words   :  %d" % sessionWords
+        print "Missed  :  %d" % sessionMissed
+        print "Accuracy:  %.2f" % getAccuracy(sessionWords, sessionMissed) 
+        print "Letters :  %d" % sessionLetters
+        print "\nTotal "
+        print "Time    :  %.2f seconds" % (now - veryStart)
+        print "Words   :  %d" % totalWords
+        print "Missed  :  %d" % totalMissed
+        print "Accuracy:  %.2f" % getAccuracy(totalWords, totalMissed) 
+        print "Letters :  %d" % totalLetters
+
         sessionLetters = 0
+        sessionMissed = 0
         playing = playAgain()
 
 if __name__ == "__main__":
