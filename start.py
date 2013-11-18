@@ -109,7 +109,7 @@ def lenChoice():
 3) 100  words
 4) 250  words
 5) 500  words
-6  1000 words
+6) 1000 words
 9) Unlimited words
 0) alphabet"""
     userChoice = valid[getValid(valid.keys())]
