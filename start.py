@@ -59,6 +59,9 @@ def typeCorrect(word):
     print "\n"        
     return True
 
+def getWPM(count, time):
+    return float(count)/(time/60)
+
 def getAccuracy(place, missed):
     total = place + missed
     return (total - float(missed))/max(total,1) * 100
@@ -135,21 +138,23 @@ def play():
         start = time.time()
         typeComplete(lenChoice())
         now = time.time()
+        sessionTime = now - start
+        totalTime = now - veryStart
         clear()
         print "-" *20
         print "Done!"
         print "-" *20
         print "Session"
-        print "Time    :  %.2f seconds" % (now - start)
+        print "Time    :  %.2f seconds" % sessionTime
         print "Words   :  %d" % sessionWords
-        print "Missed  :  %d" % sessionMissed
-        print "Accuracy:  %.2f" % getAccuracy(sessionWords, sessionMissed) 
+        print "Accuracy:  %.2f%%" % getAccuracy(sessionWords, sessionMissed) 
+        print "WPM     :  %.2f" % getWPM(sessionWords,sessionTime)
         print "Letters :  %d" % sessionLetters
         print "\nTotal "
-        print "Time    :  %.2f seconds" % (now - veryStart)
+        print "Time    :  %.2f seconds" % totalTime
         print "Words   :  %d" % totalWords
-        print "Missed  :  %d" % totalMissed
-        print "Accuracy:  %.2f" % getAccuracy(totalWords, totalMissed) 
+        print "Accuracy:  %.2f%%" % getAccuracy(totalWords, totalMissed) 
+        print "WPM     :  %.2f%%" % getWPM(totalWords, totalTime)
         print "Letters :  %d" % totalLetters
 
         sessionLetters = 0
