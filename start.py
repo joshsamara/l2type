@@ -80,8 +80,8 @@ def lenChoice():
 5) Unlimited words
 0) alphabet"""
     userChoice = getInput()
-    userChoice = (0, int(userChoice))[userChoice in ["0","1","2","3","4", "5"]]
-    return listGen(userChoice)
+    userChoice = (0, userChoice)[userChoice in ["0","1","2","3","4", "5"]]
+    return listGen(int(userChoice))
 
 def playAgain():
     print """Would you like to play again?
