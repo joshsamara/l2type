@@ -87,22 +87,22 @@ def typeComplete(wordList):
     return True
 
 def listGen(listLen):
-
     if listLen == 0:
         return [getAlhpa()]
-    elif listLen == 5:
+    elif listLen == 9:
         return []
     else:
-        return [getWord() for i in range(listLen * 25)]
+        return [getWord() for i in range(listLen)]
 
 def lenChoice():
-    valid = {"0":"alphabet", 
+    valid = {"0":0 , 
         "1":25, 
         "2":50, 
-        "4":100, 
+        "3":100,
+        "4":250, 
         "5":500,
         "6":1000, 
-        "9":"unlimited"}
+        "9":9}
     print """Choose a length:
 1) 25   words
 2) 50   words
@@ -112,7 +112,7 @@ def lenChoice():
 6  1000 words
 9) Unlimited words
 0) alphabet"""
-    userChoice = getValid(valid.keys())
+    userChoice = valid[getValid(valid.keys())]
     return listGen(int(userChoice))
 
 def playAgain():
