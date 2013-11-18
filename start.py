@@ -25,6 +25,13 @@ def getInput():
         print ""
         sys.exit()
 
+def getValid(choices):
+    userChoice = getInput()
+    if userChoice in choices:
+        return userChoice
+    else:
+        return getValid(choices)
+
 def getWord():
     return random.choice(words.all_words_4 + words.all_words_4 + words.all_words_5)
 
@@ -80,6 +87,7 @@ def typeComplete(wordList):
     return True
 
 def listGen(listLen):
+
     if listLen == 0:
         return [getAlhpa()]
     elif listLen == 5:
@@ -88,15 +96,23 @@ def listGen(listLen):
         return [getWord() for i in range(listLen * 25)]
 
 def lenChoice():
+    valid = {"0":"alphabet", 
+        "1":25, 
+        "2":50, 
+        "4":100, 
+        "5":500,
+        "6":1000, 
+        "9":"unlimited"}
     print """Choose a length:
-1) 25  words
-2) 50  words
-3) 75  words
-4) 100 words
-5) Unlimited words
+1) 25   words
+2) 50   words
+3) 100  words
+4) 250  words
+5) 500  words
+6  1000 words
+9) Unlimited words
 0) alphabet"""
-    userChoice = getInput()
-    userChoice = (0, userChoice)[userChoice in ["0","1","2","3","4", "5"]]
+    userChoice = getValid(valid.keys())
     return listGen(int(userChoice))
 
 def playAgain():
