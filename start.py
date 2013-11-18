@@ -47,15 +47,27 @@ def typeCorrect(word):
 
 def typeComplete(wordList):
     clear()
-    for i in range(len(wordList)):
-        print "%s\t\t\t\t%d/%d" % (wordList[i], i, len(wordList))
-        while not typeCorrect(wordList[i]):
-            pass
+    listLen = len(wordList)
+    if listLen > 0:
+        for i in range(listLen):
+            print "%s\t\t\t\t%d/%d" % (wordList[i], i, listLen)
+            while not typeCorrect(wordList[i]):
+                pass
+    else:
+        i = 0
+        while True:
+            word = getWord()
+            print "%s\t\t\t\t%d words"% (word, i)
+            while not typeCorrect(word):
+                pass
+            i += 1
     return True
 
 def listGen(listLen):
     if listLen == 0:
         return [getAlhpa()]
+    elif listLen == 5:
+        return []
     else:
         return [getWord() for i in range(listLen * 25)]
 
@@ -65,9 +77,10 @@ def lenChoice():
 2) 50  words
 3) 75  words
 4) 100 words
+5) Unlimited words
 0) alphabet"""
     userChoice = getInput()
-    userChoice = (0, int(userChoice))[userChoice in ["0","1","2","3","4"]]
+    userChoice = (0, int(userChoice))[userChoice in ["0","1","2","3","4", "5"]]
     return listGen(userChoice)
 
 def playAgain():
