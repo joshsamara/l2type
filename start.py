@@ -23,6 +23,7 @@ def getInput():
     else:
         # clear()
         print ""
+        printStats()
         sys.exit()
 
 def getValid(choices):
@@ -71,22 +72,27 @@ def typeComplete(wordList):
     global sessionWords 
     clear()
     listLen = len(wordList)
-    sessionWords = listLen
+    sessionWords = 0 
     if listLen > 0:
         for i in range(listLen):
             acc = getAccuracy(i, sessionMissed)
             print "%s\t\t\t%d/%d %.2f%%" % (wordList[i], i, listLen, acc)
             while not typeCorrect(wordList[i]):
                 pass
+            sessionWords += 1
     else:
         i = 0
+        start = time.time()
         while True:
+            now = time.time()
+            elapsed = now - start
             acc = getAccuracy(i, sessionMissed)
             word = getWord()
-            print "%s\t\t\t%d words %.2f%%"% (word, i, acc)
+            print "%s\t\t\t%dwords %.2f%% %.2fWPM %ds"% (word, i, acc, getWPM(i, elapsed),elapsed)
             while not typeCorrect(word):
                 pass
             i += 1
+            sessionWords = i
     return True
 
 def listGen(listLen):
@@ -124,41 +130,51 @@ def playAgain():
     userChoice = getInput().lower()
     return userChoice == "y"
 
-def play():
+def printStats():
     global totalWords 
     global totalLetters
     global totalMissed
     global sessionWords
     global sessionLetters
     global sessionMissed
+    global veryStart
+    global sessionStart
+
+    now = time.time()
+    sessionTime = now - sessionStart
+    totalTime = now - veryStart
+
+    print "-" *20
+    print "Done!"
+    print "-" *20
+    print "-----  Session  -----"
+    print "Time    :  %.2f seconds" % sessionTime
+    print "Words   :  %d" % sessionWords
+    print "Accuracy:  %.2f%%" % getAccuracy(sessionWords, sessionMissed) 
+    print "WPM     :  %.2f" % getWPM(sessionWords,sessionTime)
+    print "Letters :  %d" % sessionLetters
+    print "\n------  Total  -------"
+    print "Time    :  %.2f seconds" % totalTime
+    print "Words   :  %d" % totalWords
+    print "Accuracy:  %.2f%%" % getAccuracy(totalWords, totalMissed) 
+    print "WPM     :  %.2f%%" % getWPM(totalWords, totalTime)
+    print "Letters :  %d" % totalLetters
+
+    sessionLetters = 0
+    sessionMissed = 0
+
+
+def play():
+    global veryStart
+    global sessionStart
     playing = True
     veryStart = time.time()
     while playing:
         clear()
-        start = time.time()
+        sessionStart = time.time()
         typeComplete(lenChoice())
-        now = time.time()
-        sessionTime = now - start
-        totalTime = now - veryStart
         clear()
-        print "-" *20
-        print "Done!"
-        print "-" *20
-        print "Session"
-        print "Time    :  %.2f seconds" % sessionTime
-        print "Words   :  %d" % sessionWords
-        print "Accuracy:  %.2f%%" % getAccuracy(sessionWords, sessionMissed) 
-        print "WPM     :  %.2f" % getWPM(sessionWords,sessionTime)
-        print "Letters :  %d" % sessionLetters
-        print "\nTotal "
-        print "Time    :  %.2f seconds" % totalTime
-        print "Words   :  %d" % totalWords
-        print "Accuracy:  %.2f%%" % getAccuracy(totalWords, totalMissed) 
-        print "WPM     :  %.2f%%" % getWPM(totalWords, totalTime)
-        print "Letters :  %d" % totalLetters
-
-        sessionLetters = 0
-        sessionMissed = 0
+        printStats()
         playing = playAgain()
 
 if __name__ == "__main__":
