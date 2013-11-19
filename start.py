@@ -54,7 +54,9 @@ def typeCorrect(word):
         else:
             sessionMissed += 1
             totalMissed += 1
-            print "\n"+word
+            time.sleep(.2)
+            sys.stdout.write("\r" + " "*(len(word)*2) + "\r")
+            # print "\n"+word
             return False
     totalWords +=1
     print "\n"        
@@ -139,7 +141,6 @@ def printStats():
     global sessionMissed
     global veryStart
     global sessionStart
-
     now = time.time()
     sessionTime = now - sessionStart
     totalTime = now - veryStart
