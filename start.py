@@ -13,23 +13,33 @@ sessionWords = 0
 sessionMissed = 0
 totalMissed = 0
 
+#average management (faux randoming)
+defaultMin = 4
+defaultMax = 9
+defaultIdeal = 6
+averageWrd = 6.0 
+
+
 def load_shakes():
     global shakes
     global allSents
     global allWords
     global allWordsGrp
+    global defaultMin
+    global defaultMax
     open_time = time.time()
     print "Loading words..."
     shakes = open("shakeyspeare.txt", "r").read()
     allSents = re.findall(r'[A-Z].*[a-z].* .*\.', shakes)
-    allWords = [item for item in re.findall(r'\b[a-z]+\b', shakes.lower()) if len(item) >= 3]
+    allWords = [item for item in re.findall(r'\b[a-z]+\b', shakes.lower()) if len(item) >= defaultMin]
     allWordsGrp = {}
-    for i in range(3, 9):
-        allWordsGrp[i] = [item for item in allWords if len(item) == i]
-    allWordsGrp[9] = [item for item in allWords if len(item) >= 9]
-    #forget about 1 or two letter words
+    for i in range(defaultMin, defaultMax):
+        allWordsGrp[i] = list(set([item for item in allWords if len(item) == i])) # remove dupes
+    allWordsGrp[defaultMax] = [item for item in allWords if len(item) >= 12]
+    #forget about 1,2 or 3 letter words
     processed =  time.time() - open_time
     print "Opened, parsed, and grouped all of Shakespeare in %.2f seconds." % processed
+    print "Press any key to continue..."
     getInput()
 
 def clear():
@@ -57,8 +67,24 @@ def getSent():
     return random.choice(allSents)
 
 def getWord():
-    global allWords
-    return random.choice(allWords)
+    global allWordsGrp
+    global averageWrd
+    global defaultMin
+    global defaultMax
+    global defaultIdeal
+
+    minRange = defaultMin
+    maxRange = defaultMax
+    if averageWrd < defaultIdeal:
+        minRange += int(defaultIdeal - averageWrd)
+    else:
+        maxRange -= int(averageWrd - defaultIdeal)
+
+    rangeChoice = random.randint(minRange, maxRange)
+    wordChoice = random.choice(allWordsGrp[rangeChoice])
+    averageWrd = (averageWrd + rangeChoice) / 2.0
+
+    return wordChoice
 
 def getAlhpa():
     return "abcdefghijklmnopqrstuvwxyz"
@@ -95,7 +121,8 @@ def getAccuracy(place, missed):
 
 def typeComplete(wordList):
     global sessionMissed
-    global sessionWords 
+    global sessionWords
+    getInput() 
     clear()
     listLen = len(wordList)
     sessionWords = 0 
