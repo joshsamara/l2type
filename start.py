@@ -1,9 +1,9 @@
 #!/usr/bin/python
-import words
 import random
 import time
 import sys
 import os
+import re
 from mygetch import *
 
 totalWords = 0
@@ -12,6 +12,25 @@ sessionLetters = 0
 sessionWords = 0
 sessionMissed = 0
 totalMissed = 0
+
+def load_shakes():
+    global shakes
+    global allSents
+    global allWords
+    global allWordsGrp
+    open_time = time.time()
+    print "Loading words..."
+    shakes = open("shakeyspeare.txt", "r").read()
+    allSents = re.findall(r'[A-Z].*[a-z].* .*\.', shakes)
+    allWords = [item for item in re.findall(r'\b[a-z]+\b', shakes.lower()) if len(item) >= 3]
+    allWordsGrp = {}
+    for i in range(3, 9):
+        allWordsGrp[i] = [item for item in allWords if len(item) == i]
+    allWordsGrp[9] = [item for item in allWords if len(item) >= 9]
+    #forget about 1 or two letter words
+    processed =  time.time() - open_time
+    print "Opened, parsed, and grouped all of Shakespeare in %.2f seconds." % processed
+    getInput()
 
 def clear():
     os.system('clear')
@@ -33,8 +52,13 @@ def getValid(choices):
     else:
         return getValid(choices)
 
+def getSent():
+    global allSents
+    return random.choice(allSents)
+
 def getWord():
-    return random.choice(words.all_words_4 + words.all_words_4 + words.all_words_5)
+    global allWords
+    return random.choice(allWords)
 
 def getAlhpa():
     return "abcdefghijklmnopqrstuvwxyz"
@@ -168,7 +192,10 @@ def printStats():
 def play():
     global veryStart
     global sessionStart
+    veryStart = time.time() # incase exit before start
+    sessionStart = time.time()
     playing = True
+    load_shakes()
     veryStart = time.time()
     while playing:
         clear()
