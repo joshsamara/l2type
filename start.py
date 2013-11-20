@@ -31,7 +31,7 @@ def load_shakes():
     print "Loading words..."
     shakes = open("shakeyspeare.txt", "r").read()
     allSents = re.findall(r'[A-Z].*[a-z].* .*\.', shakes)
-    allWords = [item for item in re.findall(r'\b[a-z]+\b', shakes.lower()) if len(item) >= defaultMin]
+    allWords = [item for item in re.findall(r'\b[a-z]+\b', shakes) if len(item) >= defaultMin]
     allWordsGrp = {}
     for i in range(defaultMin, defaultMax):
         allWordsGrp[i] = list(set([item for item in allWords if len(item) == i])) # remove dupes
@@ -122,30 +122,53 @@ def getAccuracy(place, missed):
 def typeComplete(wordList):
     global sessionMissed
     global sessionWords
-    getInput() 
+    global defaultMax
     clear()
     listLen = len(wordList)
     sessionWords = 0 
     if listLen > 0:
         for i in range(listLen):
+            w1 = wordList[i]
+            try:
+                w2 = wordList[i+1]
+            except:
+                w2 = "     "
+            try:
+                w3 = wordList[i+2]
+            except:
+                w3 = "    "
+            try: 
+                w4 = wordList[i+3]
+            except:
+                w4 = "     "
             acc = getAccuracy(i, sessionMissed)
-            print "%s\t\t\t%d/%d %.2f%%" % (wordList[i], i, listLen, acc)
-            while not typeCorrect(wordList[i]):
+            printWords = ("%s  %s  %s  %s" % (w1, w2, w3, w4)).ljust(50)
+            printData = "%d/%d %.2f%%\n" % (i, listLen, acc)
+            printLine =  printWords + printData
+            sys.stdout.write(printLine)
+            while not typeCorrect(w1):
                 pass
             sessionWords += 1
+            sys.stdout.write("\x1b[2J\x1b[H")
+            # clear()
     else:
         i = 0
         start = time.time()
+        w1, w2, w3, w4 = [getWord() for x in range(4)]
         while True:
             now = time.time()
             elapsed = now - start
             acc = getAccuracy(i, sessionMissed)
-            word = getWord()
-            print "%s\t\t\t%dwords %.2f%% %.2fWPM %ds"% (word, i, acc, getWPM(i, elapsed),elapsed)
-            while not typeCorrect(word):
+            printWords = ("%s  %s  %s  %s" %(w1, w2, w3, w4)).ljust(50)
+            printData = "%dwords %.2f%% %.2fWPM %ds"% (i, acc, getWPM(i, elapsed),elapsed)
+            printLine = printWords + printData
+            print printLine
+            while not typeCorrect(w1):
                 pass
             i += 1
             sessionWords = i
+            sys.stdout.write("\x1b[2J\x1b[H")
+            w1,w2,w3,w4 = [w2,w3,w4,getWord()]
     return True
 
 def listGen(listLen):
