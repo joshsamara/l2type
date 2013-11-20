@@ -23,6 +23,7 @@ averageWrd = 6.0
 def load_shakes():
     global shakes
     global allSents
+    global allSentsSmall
     global allWords
     global allWordsGrp
     global defaultMin
@@ -30,7 +31,8 @@ def load_shakes():
     open_time = time.time()
     print "Loading words..."
     shakes = open("shakeyspeare.txt", "r").read()
-    allSents = re.findall(r'[A-Z].*[a-z].* .*\.', shakes)
+    allSents = list(set(re.findall(r'[A-Z][a-z][^\)\]\.?\n]* [^\)\]\.?\n]*[a-z][^\)\]\.?\n]*[\.!?]', shakes)))
+    allSentsSmall = [item for item in allSents if len(item) <= 50]
     allWords = [item for item in re.findall(r'\b[a-z]+\b', shakes) if len(item) >= defaultMin]
     allWordsGrp = {}
     for i in range(defaultMin, defaultMax):
@@ -64,7 +66,9 @@ def getValid(choices):
 
 def getSent():
     global allSents
-    return random.choice(allSents)
+    global allSentsSmall
+    thisSent = random.choice(allSentsSmall)
+    return random.choice(allSentsSmall)
 
 def getWord():
     global allWordsGrp
@@ -94,11 +98,15 @@ def typeCorrect(word):
     global totalLetters
     global sessionLetters
     global sessionMissed
+    global sessionWords
     global totalMissed
     for letterPos in range(len(word)):
         userInput = getInput()
         sys.stdout.write(userInput)
         if userInput == word[letterPos]:
+            if userInput == " ":
+                sessionWords += 1
+                totalWords += 1
             totalLetters += 1
             sessionLetters += 1
         else:
@@ -108,6 +116,7 @@ def typeCorrect(word):
             sys.stdout.write("\r" + " "*(len(word)*2) + "\r")
             # print "\n"+word
             return False
+    sessionWords += 1
     totalWords +=1
     print "\n"        
     return True
@@ -119,86 +128,81 @@ def getAccuracy(place, missed):
     total = place + missed
     return (total - float(missed))/max(total,1) * 100
 
-def typeComplete(wordList):
+def getFirst(mode, limit = 4):
+    generators = {"0": getSent, "1": getWord, "2": getAlhpa} 
+    words = [generators[mode]() for i in range(limit)]
+    words = words + ["     " for x in range(4-len(words))]
+    return words
+
+def getNext(mode):
+    generators = {"0": getSent, "1": getWord, "2": getAlhpa} 
+    return generators[mode]()
+
+def typeComplete(listLen, mode):
     global sessionMissed
-    global sessionWords
     global defaultMax
+    global sessionWords
     clear()
-    listLen = len(wordList)
     sessionWords = 0 
     if listLen > 0:
+        limit = (listLen, 4)[listLen >= 4]
+        w1,w2,w3,w4 = getFirst(mode, limit)
         for i in range(listLen):
-            w1 = wordList[i]
-            try:
-                w2 = wordList[i+1]
-            except:
-                w2 = "     "
-            try:
-                w3 = wordList[i+2]
-            except:
-                w3 = "    "
-            try: 
-                w4 = wordList[i+3]
-            except:
-                w4 = "     "
             acc = getAccuracy(i, sessionMissed)
-            printWords = ("%s  %s  %s  %s" % (w1, w2, w3, w4)).ljust(50)
-            printData = "%d/%d %.2f%%\n" % (i, listLen, acc)
+            if mode == "1":
+                printWords = ("%s  %s  %s  %s" % (w1, w2, w3, w4)).ljust(50)
+            else:
+                printWords = w1 + "\t"
+            printData = "%d/%d %.2f%%" % (i, listLen, acc)
             printLine =  printWords + printData
-            sys.stdout.write(printLine)
+            print printLine
             while not typeCorrect(w1):
                 pass
-            sessionWords += 1
             sys.stdout.write("\x1b[2J\x1b[H")
+            w1,w2,w3 = w2,w3,w4
+            w4 = ("     ", getNext(mode))[listLen - i > 4]
             # clear()
     else:
         i = 0
         start = time.time()
-        w1, w2, w3, w4 = [getWord() for x in range(4)]
+        w1, w2, w3, w4 = [getNext(mode) for x in range(4)]
         while True:
             now = time.time()
             elapsed = now - start
             acc = getAccuracy(i, sessionMissed)
-            printWords = ("%s  %s  %s  %s" %(w1, w2, w3, w4)).ljust(50)
-            printData = "%dwords %.2f%% %.2fWPM %ds"% (i, acc, getWPM(i, elapsed),elapsed)
+            if mode == "1":
+                printWords = ("%s  %s  %s  %s" %(w1, w2, w3, w4)).ljust(50)
+            else:
+                printWords = w1 + "\t"
+            printData = "%dwords %.2f%% %.2fWPM %ds"% (sessionWords, acc, getWPM(sessionWords, elapsed),elapsed)
             printLine = printWords + printData
             print printLine
             while not typeCorrect(w1):
                 pass
             i += 1
-            sessionWords = i
             sys.stdout.write("\x1b[2J\x1b[H")
-            w1,w2,w3,w4 = [w2,w3,w4,getWord()]
+            w1,w2,w3,w4 = [w2,w3,w4,getNext(mode)]
     return True
 
-def listGen(listLen):
-    if listLen == 0:
-        return [getAlhpa()]
-    elif listLen == 9:
-        return []
-    else:
-        return [getWord() for i in range(listLen)]
+def getLength():
+    print "\nEnter number of words"
+    print "Choose 0 for unlimited:"
+    value = raw_input("Choice: ")
+    try:
+        return max(int(value), 0)
+    except:
+        print "invalid"
+        return getLength()
 
-def lenChoice():
-    valid = {"0":0 , 
-        "1":25, 
-        "2":50, 
-        "3":100,
-        "4":250, 
-        "5":500,
-        "6":1000, 
-        "9":9}
-    print """Choose a length:
-1) 25   words
-2) 50   words
-3) 100  words
-4) 250  words
-5) 500  words
-6) 1000 words
-9) Unlimited words
-0) alphabet"""
-    userChoice = valid[getValid(valid.keys())]
-    return listGen(int(userChoice))
+
+def modeChoice():
+    valid = ["0", "1", "2"]
+    print """Choose mode:
+0) Sentences
+1) Words
+2) Alphabet"""
+    userChoice = getValid(valid)
+    return getLength(), userChoice
 
 def playAgain():
     print """Would you like to play again?
@@ -232,7 +236,7 @@ def printStats():
     print "Time    :  %.2f seconds" % totalTime
     print "Words   :  %d" % totalWords
     print "Accuracy:  %.2f%%" % getAccuracy(totalWords, totalMissed) 
-    print "WPM     :  %.2f%%" % getWPM(totalWords, totalTime)
+    print "WPM     :  %.2f" % getWPM(totalWords, totalTime)
     print "Letters :  %d" % totalLetters
 
     sessionLetters = 0
@@ -250,7 +254,7 @@ def play():
     while playing:
         clear()
         sessionStart = time.time()
-        typeComplete(lenChoice())
+        typeComplete(*modeChoice())
         clear()
         printStats()
         playing = playAgain()
