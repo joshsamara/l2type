@@ -31,7 +31,8 @@ def load_shakes():
     open_time = time.time()
     print "Loading words..."
     shakes = open("shakeyspeare.txt", "r").read()
-    allSents = list(set(re.findall(r'[A-Z][a-z][^\)\]\.?\n]* [^\)\]\.?\n]*[a-z][^\)\]\.?\n]*[\.!?]', shakes)))
+    invalids = "[^\)\]\.?\n]"
+    allSents = list(set(re.findall(r'[A-Z][a-z]%s* %s*[a-z]%s*[\.!?]' % (invalids, invalids, invalids), shakes)))
     allSentsSmall = [item for item in allSents if len(item) <= 50]
     allWords = [item for item in re.findall(r'\b[a-z]+\b', shakes) if len(item) >= defaultMin]
     allWordsGrp = {}
@@ -100,11 +101,13 @@ def typeCorrect(word):
     global sessionMissed
     global sessionWords
     global totalMissed
-    for letterPos in range(len(word)):
+    global progress
+    for letterPos in range(len(progress), len(word)):
         userInput = getInput()
         sys.stdout.write(userInput)
         if userInput == word[letterPos]:
             if userInput == " ":
+                progress = word[:(letterPos+1)]
                 sessionWords += 1
                 totalWords += 1
             totalLetters += 1
@@ -113,7 +116,8 @@ def typeCorrect(word):
             sessionMissed += 1
             totalMissed += 1
             time.sleep(.2)
-            sys.stdout.write("\r" + " "*(len(word)*2) + "\r")
+            width = int(os.popen('tput cols', 'r').read())
+            sys.stdout.write("\r" + " "* width + "\r" + progress)
             # print "\n"+word
             return False
     sessionWords += 1
@@ -142,6 +146,7 @@ def typeComplete(listLen, mode):
     global sessionMissed
     global defaultMax
     global sessionWords
+    global progress
     clear()
     sessionWords = 0 
     if listLen > 0:
@@ -156,6 +161,7 @@ def typeComplete(listLen, mode):
             printData = "%d/%d %.2f%%" % (i, listLen, acc)
             printLine =  printWords + printData
             print printLine
+            progress = ""
             while not typeCorrect(w1):
                 pass
             sys.stdout.write("\x1b[2J\x1b[H")
@@ -177,6 +183,7 @@ def typeComplete(listLen, mode):
             printData = "%dwords %.2f%% %.2fWPM %ds"% (sessionWords, acc, getWPM(sessionWords, elapsed),elapsed)
             printLine = printWords + printData
             print printLine
+            progress = ""
             while not typeCorrect(w1):
                 pass
             i += 1
