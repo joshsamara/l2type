@@ -4,6 +4,7 @@ import time
 import sys
 import os
 import re
+import operator
 from mygetch import *
 
 totalWords = 0
@@ -20,33 +21,72 @@ defaultIdeal = 6
 averageWrd = 6.0 
 
 
-def load_shakes():
-    global shakes
+def clear():
+    os.system('clear')
+
+def getTextFile():
+    clear()
+    dirPath = os.path.abspath( __file__ ).rstrip(__file__)
+    textPath = dirPath + "texts"
+    print """Use which file as a content source?:
+0) A Hitchhikers Guide to the Galaxy
+1) The complete works of Shakespeare
+2) Monty Pyhton and the Holy Grail
+3) More
+4) Random"""
+    menuChoice = getLength(4)
+    if menuChoice == 0:
+        textName = "hitchhikers_guide.txt"
+    elif menuChoice == 1:
+        textName = "shakespeare.txt"
+    elif menuChoice == 2:
+        textName = "monty_python.txt"
+    else:
+        dirName, subDirs, fileNames = os.walk(textPath).next()
+        allTexts = []
+        if menuChoice == 4:
+            textName = random.choice(fileNames)
+        else:
+            for textName in fileNames:    
+                fileSize = os.stat(textPath + "/" + textName).st_size
+                allTexts += [[textName, fileSize]]
+            allTexts.sort(key=operator.itemgetter(1), reverse = True)
+            print "Choose source to load:".ljust(50)
+            for i in range(len(allTexts)):
+                nameFrmtd = allTexts[i][0].replace(".txt","").replace("_"," ").title()
+                print "%2s)  %30s" % (i, nameFrmtd) + "  %s kb" % allTexts[i][1]
+            choice = getLength(len(allTexts))
+            textName = allTexts[choice][0]
+
+    filePath = textPath + "/" + textName
+    return(textName, filePath)
+
+def loadTextFile():
+    global textFile
     global allSents
     global allSentsSmall
     global allWords
     global allWordsGrp
     global defaultMin
     global defaultMax
+    textName, filePath = getTextFile()
+    textFile = open(filePath, 'r').read()
     open_time = time.time()
     print "Loading words..."
-    shakes = open("shakeyspeare.txt", "r").read()
-    invalids = "[^\)\]\.?\n]"
-    allSents = list(set(re.findall(r'[A-Z][a-z]%s* %s*[a-z]%s*[\.!?]' % (invalids, invalids, invalids), shakes)))
-    allSentsSmall = [item for item in allSents if len(item) <= 50]
-    allWords = [item for item in re.findall(r'\b[a-z]+\b', shakes) if len(item) >= defaultMin]
+   
+    invalids = "[^\(\[\{\}\)\]\.?\n\"]"
+    allSents = list(set(re.findall(r'[A-Z][a-z]%s* %s*[a-z]%s*[\.!?]' % (invalids, invalids, invalids), textFile)))
+    allSentsSmall = [item.replace("  ", " ") for item in allSents if len(item) <= 50]
+    allWords = [item for item in re.findall(r'\b[a-z]+\b', textFile) if len(item) >= defaultMin]
     allWordsGrp = {}
     for i in range(defaultMin, defaultMax):
         allWordsGrp[i] = list(set([item for item in allWords if len(item) == i])) # remove dupes
     allWordsGrp[defaultMax] = [item for item in allWords if len(item) >= 12]
     #forget about 1,2 or 3 letter words
     processed =  time.time() - open_time
-    print "Opened, parsed, and grouped all of Shakespeare in %.2f seconds." % processed
+    print "Opened, parsed, %s in %.2f seconds." % (textName, processed)
     print "Press any key to continue..."
     getInput()
-
-def clear():
-    os.system('clear')
 
 def getInput():
     userInput = getch()
@@ -191,25 +231,28 @@ def typeComplete(listLen, mode):
             w1,w2,w3,w4 = [w2,w3,w4,getNext(mode)]
     return True
 
-def getLength():
-    print "\nEnter number of words"
-    print "Choose 0 for unlimited:"
+def getLength(maxVal = None):
     value = raw_input("Choice: ")
     try:
-        return max(int(value), 0)
+        if maxVal is None or value > maxVal:
+            return max(int(value), 0)
+        else:
+            return getLength(maxVal)
     except:
         print "invalid"
-        return getLength()
+        return getLength(maxVal)
 
 
 def modeChoice():
-    valid = ["0", "1", "2"]
     print """Choose mode:
 0) Sentences
 1) Words
 2) Alphabet"""
-    userChoice = getValid(valid)
-    return getLength(), userChoice
+    userChoice = getLength(2)
+    print "\nEnter number of instances"
+    print "Choose 0 for unlimited:"
+    lenChoice = getLength()
+    return lenChoice, str(userChoice)
 
 def playAgain():
     print """Would you like to play again?
@@ -256,7 +299,7 @@ def play():
     veryStart = time.time() # incase exit before start
     sessionStart = time.time()
     playing = True
-    load_shakes()
+    loadTextFile()
     veryStart = time.time()
     while playing:
         clear()
