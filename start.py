@@ -46,7 +46,7 @@ def getTextFile():
 2) Monty Pyhton and the Holy Grail
 3) More
 4) Random"""
-    print dirPath
+    # print dirPath
     menuChoice = getLength(4)
     if menuChoice == 0:
         textName = "hitchhikers_guide.txt"
