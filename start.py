@@ -76,7 +76,7 @@ def loadTextFile():
    
     invalids = "[^\(\[\{\}\)\]\.?\n\"]"
     allSents = list(set(re.findall(r'[A-Z][a-z]%s* %s*[a-z]%s*[\.!?]' % (invalids, invalids, invalids), textFile)))
-    allSentsSmall = [item.replace("  ", " ") for item in allSents if len(item) <= 50]
+    allSentsSmall = [item.replace("  ", " ") for item in allSents if len(item.replace("  ", " ")) <= 50]
     allWords = [item for item in re.findall(r'\b[a-z]+\b', textFile) if len(item) >= defaultMin]
     allWordsGrp = {}
     for i in range(defaultMin, defaultMax):
@@ -195,11 +195,11 @@ def typeComplete(listLen, mode):
         for i in range(listLen):
             acc = getAccuracy(i, sessionMissed)
             if mode == "1":
-                printWords = ("%s  %s  %s  %s" % (w1, w2, w3, w4)).ljust(50)
+                printWords = ("%s  %s  %s  %s" % (w1, w2, w3, w4))
             else:
                 printWords = w1 + "\t"
             printData = "%d/%d %.2f%%" % (i, listLen, acc)
-            printLine =  printWords + printData
+            printLine = "%s  %s" (printWords.ljust(55), printData)
             print printLine
             progress = ""
             while not typeCorrect(w1):
@@ -217,11 +217,11 @@ def typeComplete(listLen, mode):
             elapsed = now - start
             acc = getAccuracy(i, sessionMissed)
             if mode == "1":
-                printWords = ("%s  %s  %s  %s" %(w1, w2, w3, w4)).ljust(50)
+                printWords = ("%s  %s  %s  %s" %(w1, w2, w3, w4))
             else:
                 printWords = w1 + "\t"
             printData = "%dwords %.2f%% %.2fWPM %ds"% (sessionWords, acc, getWPM(sessionWords, elapsed),elapsed)
-            printLine = printWords + printData
+            printLine = "%s  %s" % (printWords.ljust(55), printData)
             print printLine
             progress = ""
             while not typeCorrect(w1):
