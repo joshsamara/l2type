@@ -24,16 +24,29 @@ averageWrd = 6.0
 def clear():
     os.system('clear')
 
+#BECAUSE LJUST IS TOO INCONSISTENT
+def leftFormat(word1, word2, maxFill=55):
+    # for i in range(1,56):
+    #     sys.stdout.write(str(i % 10))
+    # sys.stdout.write("ss\n")
+    # for i in range(len(word1)):
+    #     sys.stdout.write("w")
+    # for i in range(maxFill-len(word1)):
+    #     sys.stdout.write("x")
+    # sys.stdout.write("\n")
+    return word1 + ((maxFill-len(word1))*" ") + word2
+
 def getTextFile():
     clear()
-    dirPath = os.path.abspath( __file__ ).rstrip(__file__)
-    textPath = dirPath + "texts"
+    dirPath = os.path.dirname(os.path.abspath(__file__))
+    textPath = dirPath + "/texts"
     print """Use which file as a content source?:
 0) A Hitchhikers Guide to the Galaxy
 1) The complete works of Shakespeare
 2) Monty Pyhton and the Holy Grail
 3) More
 4) Random"""
+    print dirPath
     menuChoice = getLength(4)
     if menuChoice == 0:
         textName = "hitchhikers_guide.txt"
@@ -199,7 +212,7 @@ def typeComplete(listLen, mode):
             else:
                 printWords = w1 + "\t"
             printData = "%d/%d %.2f%%" % (i, listLen, acc)
-            printLine = "%s  %s" (printWords.ljust(55), printData)
+            printLine = leftFormat(printWords, printData)
             print printLine
             progress = ""
             while not typeCorrect(w1):
@@ -221,7 +234,7 @@ def typeComplete(listLen, mode):
             else:
                 printWords = w1 + "\t"
             printData = "%dwords %.2f%% %.2fWPM %ds"% (sessionWords, acc, getWPM(sessionWords, elapsed),elapsed)
-            printLine = "%s  %s" % (printWords.ljust(55), printData)
+            printLine = leftFormat(printWords, printData)
             print printLine
             progress = ""
             while not typeCorrect(w1):
