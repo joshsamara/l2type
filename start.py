@@ -24,17 +24,9 @@ averageWrd = 6.0
 def clear():
     os.system('clear')
 
-#BECAUSE LJUST IS TOO INCONSISTENT
-def leftFormat(word1, word2, maxFill=55):
-    # for i in range(1,56):
-    #     sys.stdout.write(str(i % 10))
-    # sys.stdout.write("ss\n")
-    # for i in range(len(word1)):
-    #     sys.stdout.write("w")
-    # for i in range(maxFill-len(word1)):
-    #     sys.stdout.write("x")
-    # sys.stdout.write("\n")
-    return word1 + ((maxFill-len(word1))*" ") + word2
+def leftFormat(word1, word2, maxFill=52):
+    spaceFill = ((maxFill-(len(word1)-1))*" ")
+    return word2 + "\n\n" + word1 + spaceFill
 
 def getTextFile():
     clear()
@@ -210,8 +202,8 @@ def typeComplete(listLen, mode):
             if mode == "1":
                 printWords = ("%s  %s  %s  %s" % (w1, w2, w3, w4))
             else:
-                printWords = w1 + "\t"
-            printData = "%d/%d %.2f%%" % (i, listLen, acc)
+                printWords = w1
+            printData = "Stats: %4d/%-4d %.2f%%" % (i, listLen, acc)
             printLine = leftFormat(printWords, printData)
             print printLine
             progress = ""
@@ -232,8 +224,8 @@ def typeComplete(listLen, mode):
             if mode == "1":
                 printWords = ("%s  %s  %s  %s" %(w1, w2, w3, w4))
             else:
-                printWords = w1 + "\t"
-            printData = "%dwords %.2f%% %.2fWPM %ds"% (sessionWords, acc, getWPM(sessionWords, elapsed),elapsed)
+                printWords = w1
+            printData = "Stats: %4dwords %.2f%% %.2fWPM %4ds"% (sessionWords, acc, getWPM(sessionWords, elapsed),elapsed)
             printLine = leftFormat(printWords, printData)
             print printLine
             progress = ""
