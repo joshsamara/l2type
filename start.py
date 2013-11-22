@@ -24,9 +24,8 @@ averageWrd = 6.0
 def clear():
     os.system('clear')
 
-def leftFormat(word1, word2, maxFill=52):
-    spaceFill = ((maxFill-(len(word1)-1))*" ")
-    return word2 + "\n\n" + word1 + spaceFill
+def leftFormat(wordline, stats):
+    return stats + "\n\n" + wordline
 
 def getTextFile():
     clear()
@@ -81,7 +80,7 @@ def loadTextFile():
    
     invalids = "[^\(\[\{\}\)\]\.?\n\"]"
     allSents = list(set(re.findall(r'[A-Z][a-z]%s* %s*[a-z]%s*[\.!?]' % (invalids, invalids, invalids), textFile)))
-    allSentsSmall = [item.replace("  ", " ") for item in allSents if len(item.replace("  ", " ")) <= 50]
+    allSentsSmall = [item.replace("  ", " ") for item in allSents if len(item.replace("  ", " ")) <= 75]
     allWords = [item for item in re.findall(r'\b[a-z]+\b', textFile) if len(item) >= defaultMin]
     allWordsGrp = {}
     for i in range(defaultMin, defaultMax):
@@ -203,7 +202,7 @@ def typeComplete(listLen, mode):
                 printWords = ("%s  %s  %s  %s" % (w1, w2, w3, w4))
             else:
                 printWords = w1
-            printData = "Stats: %4d/%-4d %.2f%%" % (i, listLen, acc)
+            printData = "Stats:    %4d/%-4d    %.2f%%" % (i, listLen, acc)
             printLine = leftFormat(printWords, printData)
             print printLine
             progress = ""
@@ -225,7 +224,7 @@ def typeComplete(listLen, mode):
                 printWords = ("%s  %s  %s  %s" %(w1, w2, w3, w4))
             else:
                 printWords = w1
-            printData = "Stats: %4dwords %.2f%% %.2fWPM %4ds"% (sessionWords, acc, getWPM(sessionWords, elapsed),elapsed)
+            printData = "Stats:    %4dwords    %.2f%%    %.2fWPM    %4ds"% (sessionWords, acc, getWPM(sessionWords, elapsed),elapsed)
             printLine = leftFormat(printWords, printData)
             print printLine
             progress = ""
