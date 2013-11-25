@@ -78,7 +78,7 @@ One big difference between option 0 and 1/2 is that in option 0 you must type sp
 between words whereas the other options you do NOT need to type spaces.
 
 #### Instances ####
-Any number (0 for unlimited)
+Any number (0 for unlimited [Recommended])
 
 Enter 0 here to do an unlimited amount of your previously selected value.
 Enter a valid integer and you will have to type the given number of values
