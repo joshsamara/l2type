@@ -156,6 +156,9 @@ def typeCorrect(word):
                 totalWords += 1
             totalLetters += 1
             sessionLetters += 1
+        elif userInput == "\t":
+            print "\n"
+            return True
         else:
             sessionMissed += 1
             totalMissed += 1
@@ -195,14 +198,14 @@ def typeComplete(listLen, mode):
     sessionWords = 0 
     if listLen > 0:
         limit = (listLen, 4)[listLen >= 4]
-        w1,w2,w3,w4 = getFirst(mode, limit)
-        for i in range(listLen):
-            acc = getAccuracy(i, sessionMissed)
+        w1,w2,w3,w4 = [getNext(mode) for i in range(4)]
+        while listLen > sessionWords:
+            acc = getAccuracy(sessionWords, sessionMissed)
             if mode == "1":
                 printWords = ("%s  %s  %s  %s" % (w1, w2, w3, w4))
             else:
                 printWords = w1
-            printData = "Stats:    %4d/%-4d    %.2f%%" % (i, listLen, acc)
+            printData = "Stats:    %4d/%-4d    %.2f%%" % (sessionWords, listLen, acc)
             printLine = leftFormat(printWords, printData)
             print printLine
             progress = ""
@@ -210,7 +213,7 @@ def typeComplete(listLen, mode):
                 pass
             sys.stdout.write("\x1b[2J\x1b[H")
             w1,w2,w3 = w2,w3,w4
-            w4 = ("     ", getNext(mode))[listLen - i > 4]
+            w4 = getNext(mode)
             # clear()
     else:
         i = 0
@@ -219,7 +222,7 @@ def typeComplete(listLen, mode):
         while True:
             now = time.time()
             elapsed = now - start
-            acc = getAccuracy(i, sessionMissed)
+            acc = getAccuracy(sessionWords, sessionMissed)
             if mode == "1":
                 printWords = ("%s  %s  %s  %s" %(w1, w2, w3, w4))
             else:
