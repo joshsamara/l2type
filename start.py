@@ -34,7 +34,7 @@ def getTextFile():
     print """Use which file as a content source?:
 0) A Hitchhikers Guide to the Galaxy
 1) The complete works of Shakespeare
-2) Monty Pyhton and the Holy Grail
+2) Monty Python and the Holy Grail
 3) More
 4) Random"""
     # print dirPath
