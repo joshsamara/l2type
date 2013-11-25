@@ -87,7 +87,7 @@ If you anter a non 0 value, you get sent back to the _Mode_ option after complet
 
 Other Important Information
 ---------------------------
-### PRESS TAB ### to skip any words or sentences
+### PRESS TAB to skip any words or sentences ###
 If you find any issues with this game, please report them to me at joshsamara@gmail.com
 
 
