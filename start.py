@@ -240,14 +240,22 @@ def typeComplete(listLen, mode):
 
 def getLength(maxVal = None):
     value = raw_input("Choice: ")
-    try:
-        if maxVal is None or value > maxVal:
-            return max(int(value), 0)
-        else:
+    if value.lower() == "exit":
+        print ""
+        printStats()
+        sys.exit()
+    else:
+        try:
+            value = int(value)
+            if maxVal is None:
+                return max(-1*value, value)
+            elif value <= maxVal:
+                return max(-1*value, value)
+            else:
+                raise Exception("Value too large")
+        except:
+            print "invalid"
             return getLength(maxVal)
-    except:
-        print "invalid"
-        return getLength(maxVal)
 
 
 def modeChoice():
