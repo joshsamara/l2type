@@ -20,6 +20,7 @@ defaultMax = 9
 defaultIdeal = 6
 averageWrd = 6.0 
 
+difficulty = 0
 
 def clear():
     os.system('clear')
@@ -92,6 +93,14 @@ def loadTextFile():
     print "Press any key to continue..."
     getInput()
 
+def getDifficulty():
+    global difficulty
+    print """
+Choose a difficulty:
+0) Easy
+1) Hard"""
+    difficulty = getLength(1)
+
 def getInput():
     userInput = getch()
     if userInput != '\x1b':
@@ -146,11 +155,14 @@ def typeCorrect(word):
     global sessionWords
     global totalMissed
     global progress
+    global difficulty
     for letterPos in range(len(progress), len(word)):
         userInput = getInput()
         sys.stdout.write(userInput)
         if userInput == word[letterPos]:
-            if userInput == " ":
+            if userInput != " " and difficulty == 0:
+                progress = word[:(letterPos+1)]
+            elif userInput == " ":
                 progress = word[:(letterPos+1)]
                 sessionWords += 1
                 totalWords += 1
@@ -315,6 +327,7 @@ def play():
     sessionStart = time.time()
     playing = True
     loadTextFile()
+    getDifficulty()
     veryStart = time.time()
     while playing:
         clear()
