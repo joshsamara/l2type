@@ -78,7 +78,7 @@ def loadTextFile():
     open_time = time.time()
     print "Loading words..."
    
-    invalids = "[^\(\[\{\}\)\]\.?\n\"]"
+    invalids = "[^\(\[\{\}\)\]\.?\n\"><]"
     allSents = list(set(re.findall(r'[A-Z][a-z]%s* %s*[a-z]%s*[\.!?]' % (invalids, invalids, invalids), textFile)))
     allSentsSmall = [item.replace("  ", " ") for item in allSents if len(item.replace("  ", " ")) <= 75]
     allWords = [item for item in re.findall(r'\b[a-z]+\b', textFile) if len(item) >= defaultMin]
