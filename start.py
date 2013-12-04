@@ -82,7 +82,7 @@ def loadTextFile():
     invalids = "[^\(\[\{\}\)\]\.?\n\"><]"
     allSents = list(set(re.findall(r'[A-Z][a-z]%s* %s*[a-z]%s*[\.!?]' % (invalids, invalids, invalids), textFile)))
     allSentsSmall = [item.replace("  ", " ") for item in allSents if len(item.replace("  ", " ")) <= 75]
-    allWords = [item for item in re.findall(r'\b[a-z]+\b', textFile) if len(item) >= defaultMin]
+    allWords = [item for item in list(set(re.findall(r'\b[a-z]+\b', textFile))) if len(item) >= defaultMin]
     allWordsGrp = {}
     for i in range(defaultMin, defaultMax):
         allWordsGrp[i] = list(set([item for item in allWords if len(item) == i])) # remove dupes
